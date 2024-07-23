@@ -1,0 +1,15 @@
+{
+    "dependencies": {
+        "casadi": {
+            "cmake-args": [
+                "-DWITH_IPOPT=ON",
+                "-DWITH_BUILD_IPOPT=ON",
+                "-DWITH_BUILD_MUMPS=ON",
+                "-DWITH_BUILD_METIS=ON",
+                "-DWITH_BUILD_LAPACK=ON",
+                "-DWITH_SPRAL=ON"
+            ]
+        }
+    }
+}
+

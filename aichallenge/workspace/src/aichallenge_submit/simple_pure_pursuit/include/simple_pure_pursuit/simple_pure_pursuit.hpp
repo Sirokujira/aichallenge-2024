@@ -9,6 +9,7 @@
 #include <nav_msgs/msg/odometry.hpp>
 #include <optional>
 #include <rclcpp/rclcpp.hpp>
+#include <casadi/casadi.hpp>
 
 namespace simple_pure_pursuit {
 
@@ -23,23 +24,21 @@ class SimplePurePursuit : public rclcpp::Node {
  public:
   explicit SimplePurePursuit();
   
-  // subscribers
+  // サブスクリプション
   rclcpp::Subscription<Odometry>::SharedPtr sub_kinematics_;
   rclcpp::Subscription<Trajectory>::SharedPtr sub_trajectory_;
   
-  // publishers
+  // パブリッシャー
   rclcpp::Publisher<AckermannControlCommand>::SharedPtr pub_cmd_;
   
-  // timer
+  // タイマー
   rclcpp::TimerBase::SharedPtr timer_;
 
-  // updated by subscribers
+  // サブスクリプションで更新されるデータ
   Trajectory::SharedPtr trajectory_;
   Odometry::SharedPtr odometry_;
 
-
-
-  // pure pursuit parameters
+  // パラメーター
   const double wheel_base_;
   const double lookahead_gain_;
   const double lookahead_min_distance_;
@@ -47,10 +46,21 @@ class SimplePurePursuit : public rclcpp::Node {
   const bool use_external_target_vel_;
   const double external_target_vel_;
 
-
  private:
   void onTimer();
   bool subscribeMessageAvailable();
+
+  // MPC固有のメンバー
+  //void initialize_mpc();
+  void initialize_mpc(const std::vector<TrajectoryPoint> &trajectory, size_t closest_traj_point_idx);
+  std::vector<double> compute_control(const std::vector<double> &state_estimate);
+  casadi::Function solver_;
+  casadi::DM x_ref_;
+  int N_;
+  double dt_;
+  bool isInit; 
+
+  AckermannControlCommand zeroAckermannControlCommand(rclcpp::Time stamp);
 };
 
 }  // namespace simple_pure_pursuit
